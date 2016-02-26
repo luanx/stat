@@ -16,7 +16,9 @@ import java.util.List;
 public interface OrderAreaDao extends PagingAndSortingRepository<OrderArea, Long>, JpaSpecificationExecutor<OrderArea> {
 
     @Query("select orderArea.stateCn as stateCn,  count(orderArea) as num from OrderArea orderArea, Organization organization where orderArea.organizationId= organization.id and  orderArea.created >=?1 and orderArea.created <= ?2 and orderArea.organizationId=?3 group by orderArea.state order by count(orderArea) asc")
-    List<Object[]> countByDate(Date startDate, Date endDate, Long organizationId);
+    List<Object[]> countByDateAndOrganizationId(Date startDate, Date endDate, Long organizationId);
 
+    @Query("select orderArea.organizationId as organizationId, orderArea.state as state, orderArea.stateCn as stateCn,  count(orderArea) as num from OrderArea orderArea, Organization organization where orderArea.organizationId= organization.id and  orderArea.created >=?1 and orderArea.created <= ?2 group by orderArea.organizationId, orderArea.state order by count(orderArea) asc")
+    List<Object[]> countByDate(Date startDate, Date endDate);
 
 }

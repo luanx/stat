@@ -41,6 +41,7 @@
                         <button type="button" class="btn btn-default">1M</button>
                         <button type="button" class="btn btn-default">3M</button>
                         <button type="button" class="btn btn-default">6M</button>
+                        <button type="button" class="btn btn-default">1Y</button>
                     </div>
                     <select id="organizationList" class="selectpicker mr5" data-width="100px"
                             data-style="btn btn-default">
@@ -49,13 +50,13 @@
                         </c:forEach>
                     </select>
                 </div>
-                <div id="date-picker">
+                <%--<div id="date-picker">
                     <span>From:</span>
                     <input type="text" id="startDate" class="input-sm" pattern="yyyy/MM/dd"/>
                     <span>To:</span>
                     <input type="text" id="endDate" class="input-sm" pattern="yyyy/MM/dd"/>
                     <input type="button" id="submit_btn" class="btn btn-primary" value="查询"/>
-                </div>
+                </div>--%>
             </div>
             <div id="chart" class="panel-body" style="height:1500px;">
             </div>
@@ -127,6 +128,9 @@
                 case "6M":
                     startDate = new Date().addDays(-180).format("yyyy-MM-dd");
                     break;
+                case "1Y":
+                    startDate = new Date().addDays(-365).format("yyyy-MM-dd");
+                    break;
                 default:
                     startDate = new Date().addDays(-7).format("yyyy-MM-dd");
                     break;
@@ -137,7 +141,7 @@
 
     });
 
-    $("#submit_btn").click(function () {
+    /*$("#submit_btn").click(function () {
         var startDate = $("#startDate").val();
         var endDate = $("#endDate").val();
         if (startDate == null || startDate == "" || typeof(startDate) == "undefined") {
@@ -153,7 +157,7 @@
             $("#error_prompt").modal();
         }
         init(startDate, endDate);
-    });
+    });*/
 
     function init(startDate, endDate) {
         // 基于准备好的dom，初始化echarts图表
@@ -169,7 +173,7 @@
 
         myChart.showLoading({
             text: "数据加载中",
-            effect: "dynamicLine",
+            effect: "ring",
             textStyle: {
                 fontSize: 20
             }

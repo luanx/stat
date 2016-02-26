@@ -42,6 +42,7 @@
                         <button type="button" class="btn btn-default">1M</button>
                         <button type="button" class="btn btn-default">3M</button>
                         <button type="button" class="btn btn-default">6M</button>
+                        <button type="button" class="btn btn-default">1Y</button>
                     </div>
                     <select id="organizationList" class="selectpicker mr5" data-width="100px"
                             data-style="btn btn-default">
@@ -127,6 +128,9 @@
                     break;
                 case "6M":
                     startDate = new Date().addDays(-180).format("yyyy-MM-dd");
+                    break;
+                case "1Y":
+                    startDate = new Date().addDays(-365).format("yyyy-MM-dd");
                     break;
                 default:
                     startDate = new Date().addDays(-7).format("yyyy-MM-dd");

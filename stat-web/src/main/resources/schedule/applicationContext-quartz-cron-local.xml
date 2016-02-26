@@ -26,14 +26,16 @@
     <!--Cron式Trigger定义-->
     <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="cronJobDetail" />
-        <!--周一zhi至周五，朝九晚五工作时间内每半小时运行一次-->
-        <property name="cronExpression" value="0 10/30 9-17 ? * MON-FRI" />
+        <!--每天1点运行一次-->
+        <property name="cronExpression" value="0 0 1 * * ?"/>
  </bean>
 
     <!--JobDetail，基于MethodInvokingJobDetailFactoryBean调用普通Spring Bean-->
     <bean id="cronJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="expressScanner" />
-        <property name="targetMethod" value="executeByQuartzLocalJob" />
+        <!--<property name="targetObject" ref="expressScanner" />
+        <property name="targetMethod" value="executeByQuartzLocalJob" />-->
+        <property name="targetObject" ref="areaCountScanner"/>
+        <property name="targetMethod" value="executeByQuartzLocalJob"/>
         <!--同一任务在前一次执行未完成而Trigger时间又到时是否并发开始新的执行，默认为true-->
         <property name="concurrent" value="true" />
     </bean>

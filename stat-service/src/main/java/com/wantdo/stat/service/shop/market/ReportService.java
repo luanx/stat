@@ -12,8 +12,10 @@ import com.github.abel533.echarts.series.Line;
 import com.github.abel533.echarts.series.Pie;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.wantdo.stat.dao.shop.AreaCountDao;
 import com.wantdo.stat.dao.shop.OrderAreaDao;
 import com.wantdo.stat.dao.shop.OrderDao;
+import com.wantdo.stat.entity.shop.AreaCount;
 import com.wantdo.stat.entity.shop.Order;
 import com.wantdo.stat.utils.DateUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +44,11 @@ public class ReportService {
 
     @Autowired
     private OrderAreaDao orderAreaDao;
+
+    @Autowired
+    private AreaCountDao areaCountDao;
+
+    private static final int[] days = new int[]{7, 14, 30, 90, 180, 365};
 
     public Option getTotalOption(String start, String end, Long organizationId) {
         Option option = new Option();
@@ -97,16 +104,16 @@ public class ReportService {
 
         String format = "yyyy-MM-dd";
 
-        List<Object[]> orderAreas = orderAreaDao.countByDate(startDate, endDate, organizationId);
+        List<AreaCount> areaCounts = areaCountDao.findByDateAndOrganizationId(startDate, endDate, organizationId);
         List<String> areas = Lists.newArrayList();
         List<Long> nums = Lists.newArrayList();
-        for(Object[] orderArea: orderAreas){
-            String area = (String)orderArea[0];
-            if (StringUtils.isEmpty(area)){
-                area = "其他";
+        for(AreaCount areaCount: areaCounts){
+            String stateCn = areaCount.getStateCn();
+            if (StringUtils.isEmpty(stateCn)){
+                stateCn = "其他";
             }
-            areas.add(area);
-            Long num = (Long)orderArea[1];
+            areas.add(stateCn);
+            Long num = areaCount.getNum();
             nums.add(num);
         }
 
@@ -127,7 +134,7 @@ public class ReportService {
         Date startDate = new DateTime(start).withTimeAtStartOfDay().toDate();
         Date endDate = new DateTime(end).millisOfDay().withMaximumValue().toDate();
 
-        option.title("下单时间汇总情况");
+        option.title("下单时间汇总情况(美国时间)");
         option.tooltip().trigger(Trigger.axis);
         option.legend("订单数量");
         option.toolbox().show(true).feature(Tool.mark,
@@ -184,7 +191,7 @@ public class ReportService {
         Date startDate = new DateTime(start).withTimeAtStartOfDay().toDate();
         Date endDate = new DateTime(end).millisOfDay().withMaximumValue().toDate();
 
-        option.title("购买时间汇总情况");
+        option.title("购买时间汇总情况(美国时间)");
         option.tooltip().trigger(Trigger.axis);
         option.legend("订单数量");
         option.toolbox().show(true).feature(Tool.mark,
@@ -267,6 +274,32 @@ public class ReportService {
 
         option.series(pie);
         return option;
+    }
+
+    public void areaSchedule(){
+        for(int i=0; i<days.length; i++){
+            Date startDate = new DateTime().minusDays(days[i]).withTimeAtStartOfDay().toDate();
+            Date endDate = new DateTime().millisOfDay().withMaximumValue().toDate();
+            List<Object[]> orderAreas = orderAreaDao.countByDate(startDate, endDate);
+
+            for(Object[] orderArea: orderAreas){
+                Long organizationId = (Long)orderArea[0];
+                String state = (String) orderArea[1];
+                String stateCn = (String) orderArea[2];
+                Long num = (Long) orderArea[3];
+
+                AreaCount areaCount = new AreaCount();
+                areaCount.setStartDate(startDate);
+                areaCount.setEndDate(endDate);
+                areaCount.setOrganizationId(organizationId);
+                areaCount.setState(state);
+                areaCount.setStateCn(stateCn);
+                areaCount.setNum(num);
+                areaCount.setCreated(new Date());
+
+                areaCountDao.save(areaCount);
+            }
+        }
     }
 
 
