@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups xmlns="http://www.isdc.ro/wro" >
+
+<group name="all">
+
+        <!--js begin-->
+        <js minimize="false">/static/js/jquery-1.11.1.min.js</js>
+        <js minimize="false">/static/js/jquery-migrate-1.2.1.min.js</js>
+        <js minimize="false">/static/js/jquery-ui-1.10.3.min.js</js>
+        <js minimize="false">/static/js/bootstrap.min.js</js>
+        <js minimize="false">/static/js/modernizr.min.js</js>
+        <js minimize="false">/static/js/jquery.sparkline.min.js</js>
+        <js minimize="false">/static/js/toggles.min.js</js>
+        <js minimize="false">/static/js/retina.min.js</js>
+        <js minimize="false">/static/js/flot/jquery.flot.min.js</js>
+        <js minimize="false">/static/js/flot/jquery.flot.resize.min.js</js>
+        <js minimize="false">/static/js/flot/jquery.flot.spline.min.js</js>
+        <js minimize="false">/static/js/morris.min.js</js>
+        <js minimize="false">/static/js/raphael-2.1.0.min.js</js>
+        <js minimize="false">/static/js/jquery.validate.min.js</js>
+        <js minimize="false">/static/js/bootstrap-datetimepicker.min.js</js>
+        <js minimize="false">/static/js/bootstrap-table.min.js</js>
+        <js minimize="false">/static/js/jquery.json.min.js</js>
+        <js minimize="false">/static/js/bootstrap-editable.min.js</js>
+
+        <js>/static/js/bootstrap-table-editable.js</js>
+        <js>/static/js/jquery.cookies.js</js>
+        <js>/static/js/bootstrap-select.js</js>
+        <js>/static/js/messages_bs_zh.js</js>
+        <js>/static/js/bootstrap-treeview.js</js>
+        <js>/static/js/custom.js</js>
+        <js>/static/js/jquery.ui.widget.js</js>
+        <js>/static/js/jquery.fileupload.js</js>
+        <js>/static/js/select2.min.js</js>
+        <js>/static/js/date.js</js>
+        <!--js end-->
+        
+        <!--css begin-->
+        <css minimize="false">/static/css/bootstrap.min.css</css>
+        <css>/static/css/bootstrap-override.css</css>
+        <css>/static/css/style.default.css</css>
+        <css minimize="false">/static/css/weather-icons.min.css</css>
+        <css>/static/css/jquery-ui-1.10.3.css</css>
+        <css minimize="false">/static/css/font-awesome.min.css</css>
+        <css minimize="false">/static/css/animate.min.css</css>
+        <css>/static/css/animate.delay.css</css>
+        <css>/static/css/toggles.css</css>
+        <css>/static/css/select2.css</css>
+        <css>/static/css/lato.css</css>
+        <css>/static/css/roboto.css</css>
+        <css>/static/css/jquery-ui-1.10.3.css</css>
+        <css>/static/css/validate.css</css>
+        <css>/static/css/fileupload/jquery.fileupload.css</css>
+        <css>/static/css/fileupload/jquery.fileupload-ui.css</css>
+        <css minimize="false">/static/css/csshake.min.css</css>
+        <css minimize="false">/static/css/bootstrap-table.min.css</css>
+        <css>/static/css/bootstrap-select.css</css>
+        <css>/static/css/bootstrap-editable.css</css>
+
+        <!--css end-->
+
+</group>
+
+</groups>
