@@ -27,6 +27,20 @@
         </dependency>
         <!--Persistence end-->
 
+        <!--General Utils begin-->
+        <!--freemarker-->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+        </dependency>
+
+        <!--itext-->
+        <dependency>
+            <groupId>org.xhtmlrenderer</groupId>
+            <artifactId>flying-saucer-pdf</artifactId>
+        </dependency>
+        <!--General Utils end-->
+
         <!--Web begin-->
         <!--spring-->
         <dependency>

@@ -228,11 +228,6 @@
             <artifactId>httpcore</artifactId>
         </dependency>
 
-        <!--freemarker-->
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-        </dependency>
 
         <!--dozer-->
         <dependency>

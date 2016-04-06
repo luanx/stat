@@ -61,6 +61,7 @@
         <jetty.version>7.6.14.v20131031</jetty.version>
         <wro4j.version>1.6.2</wro4j.version>
         <mockito.version>1.10.16</mockito.version>
+        <flying-saucer-pdf.version>9.0.3</flying-saucer-pdf.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
@@ -491,6 +492,14 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <!--itext-->
+            <dependency>
+                <groupId>org.xhtmlrenderer</groupId>
+                <artifactId>flying-saucer-pdf</artifactId>
+                <version>${flying-saucer-pdf.version}</version>
+            </dependency>
+
             <!--Other Tool end-->
 
             <!--Test begin-->
