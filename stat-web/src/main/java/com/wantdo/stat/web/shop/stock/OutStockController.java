@@ -48,7 +48,7 @@ public class OutStockController {
     public String list(Model model) {
         List<Platform> platforms = platformService.getAllPlatform();
         model.addAttribute("platforms", platforms);
-        return "shop/stock/outstockOrderList";
+        return "shop/stock/outstock";
     }
 
     /**
