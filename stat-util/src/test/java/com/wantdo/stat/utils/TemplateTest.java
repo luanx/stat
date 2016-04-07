@@ -1,13 +1,17 @@
 package com.wantdo.stat.utils;
 
-import com.wantdo.stat.entity.account.User;
+import com.google.common.collect.Lists;
+import com.wantdo.stat.entity.shop.Platform;
+import com.wantdo.stat.entity.shop.StockOrder;
+import com.wantdo.stat.entity.shop.StockOrderItem;
+import com.wantdo.stat.entity.shop.StockProduct;
 import com.wantdo.stat.template.HtmlHelper;
 import com.wantdo.stat.template.PDFHelper;
 import org.junit.Test;
 
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,17 +30,37 @@ public class TemplateTest {
             String outputFile = "template.pdf";
             Map<String, Object> variables = new HashMap<String, Object>();
 
-            List<User> userList = new ArrayList<User>();
+            List<StockOrder> stockOrderList = Lists.newArrayList();
 
-            User tom = new User();
-            tom.setName("tom");
-            User amy = new User();
-            amy.setName("amy");
+            StockOrder stockOrder = new StockOrder();
+            stockOrder.setStockId("aaa");
+            //stockOrder.setOrderId("bbb");
+            stockOrder.setOutStock(new Date());
+            Platform platform = new Platform();
+            platform.setName("安致");
+            stockOrder.setPlatform(platform);
 
-            userList.add(tom);
-            userList.add(amy);
+            List<StockOrderItem> stockOrderItemList = Lists.newArrayList();
+            StockOrderItem stockOrderItem1 = new StockOrderItem();
+            stockOrderItem1.setSku("ccc");
+            stockOrderItem1.setNum(1L);
+            StockProduct stockProduct1 = new StockProduct();
+            stockProduct1.setName("xxx");
+            stockOrderItem1.setStockProduct(stockProduct1);
 
-            variables.put("userList", userList);
+            StockOrderItem stockOrderItem2 = new StockOrderItem();
+            stockOrderItem2.setSku("ddd");
+            stockOrderItem2.setNum(1L);
+            StockProduct stockProduct2 = new StockProduct();
+            stockProduct2.setName("yyy");
+            stockOrderItem2.setStockProduct(stockProduct2);
+
+            stockOrderItemList.add(stockOrderItem1);
+            stockOrderItemList.add(stockOrderItem2);
+            stockOrder.setStockOrderItemList(stockOrderItemList);
+            stockOrderList.add(stockOrder);
+
+            variables.put("stockOrderList", stockOrderList);
 
             String htmlStr = HtmlHelper.generate("template.ftl", variables);
 

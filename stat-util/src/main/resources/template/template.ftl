@@ -21,57 +21,60 @@
 
 </head>
 <body>
-<div class="contentpanel">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h2 style="text-align: center;font-family: SimSun;">出库单</h2>
-        </div>
-        <div class="panel-body">
 
-            <div class="row">
-                <div class="col-sm-6 text-left">
-                    <p><strong>销售单号:</strong> January 20, 2014</p>
-                    <p><strong>所属店铺:</strong> January 22, 2014</p>
-                    <p><strong>出库时间:</strong> January 22, 2014</p>
-                    <p><strong>出库单号:</strong> INV-000464F4-00</p>
-                    <p><strong>目的地址:</strong> 美国</p>
-                </div>
+ <#list stockOrderList as stockOrder>
+ <div class="contentpanel" style="page-break-after:always;">
+     <div class="panel panel-default">
+         <div class="panel-heading">
+             <h2 style="text-align: center;font-family: SimSun;">出库单</h2>
+         </div>
+         <div class="panel-body">
 
-            </div>
-            <!-- row -->
+             <div class="row">
+                 <div class="col-sm-6 text-left">
+                     <p><strong>销售单号:</strong> ${stockOrder.orderId?default("")}</p>
 
-            <div class="table-responsive">
-                <table class="table table-invoice">
-                    <thead>
-                    <tr>
-                        <th>序号</th>
-                        <th>SKU</th>
-                        <th>商品名称</th>
-                        <th>数量</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>aaa</td>
-                        <td>bbbb</td>
-                        <td>1</td>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>aaa</td>
-                        <td>bbbb</td>
-                        <td>1</td>
-                    </tr>
+                     <p><strong>所属店铺:</strong> ${stockOrder.platform.name?default("")}</p>
 
-                </tbody>
-            </table>
+                     <p><strong>出库时间:</strong> ${stockOrder.outStock?default("")}</p>
 
-        </div>
-        <!-- panel-body -->
-    </div>
-    <!-- panel -->
-    </div>
-</div>
+                     <p><strong>出库单号:</strong> ${stockOrder.stockId?default("")}</p>
+
+                     <p><strong>目的地址:</strong> 美国</p>
+
+                 </div>
+
+             </div>
+             <!-- row -->
+
+             <div class="table-responsive">
+                 <table class="table table-invoice">
+                     <thead>
+                     <tr>
+                         <th>序号</th>
+                         <th>SKU</th>
+                         <th>商品名称</th>
+                         <th>数量</th>
+                     </tr>
+                     </thead>
+                     <tbody>
+                         <#list stockOrder.stockOrderItemList as stockOrderItem>
+                            <tr>
+                                <td>${stockOrderItem_index}</td>
+                                <td>${stockOrderItem.sku?default("")}</td>
+                                <td>${stockOrderItem.stockProduct.name?default("")}</td>
+                                <td>${stockOrderItem.num?default("")}</td>
+                            </tr>
+                         </#list>
+                     </tbody>
+                 </table>
+
+             </div>
+             <!-- panel-body -->
+         </div>
+         <!-- panel -->
+     </div>
+ </div>
+ </#list>
 </body>
 </html>

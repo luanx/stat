@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.List;
+
 /**
  * @Date : 2015-9-17
  * @From : stat
@@ -14,5 +16,10 @@ public interface StockOrderDao extends PagingAndSortingRepository<StockOrder, Lo
 
     @Query("select stockOrder from StockOrder stockOrder where stockOrder.orderId = ?1")
     StockOrder findByOrderId(String orderId);
+
+    @Query("select stockOrder from StockOrder stockOrder where stockOrder.status = 0")
+    List<StockOrder> findAllUnStocked();
+
+    StockOrder findFirstByOrderByIdDesc();
 
 }

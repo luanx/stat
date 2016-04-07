@@ -1,12 +1,12 @@
 package com.wantdo.stat.service.shop.stock;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.wantdo.stat.constant.DateFormatConstant;
 import com.wantdo.stat.constant.PathConstant;
 import com.wantdo.stat.dao.shop.PlatformDao;
 import com.wantdo.stat.dao.shop.StockOrderDao;
 import com.wantdo.stat.dao.shop.StockOrderItemDao;
-import com.wantdo.stat.entity.account.User;
 import com.wantdo.stat.entity.front.response.ResponseVo;
 import com.wantdo.stat.entity.front.response.ResponseVoResultCode;
 import com.wantdo.stat.entity.front.vo.PDFVo;
@@ -21,6 +21,8 @@ import com.wantdo.stat.persistence.SearchFilter;
 import com.wantdo.stat.service.account.ServiceException;
 import com.wantdo.stat.template.HtmlHelper;
 import com.wantdo.stat.template.PDFHelper;
+import com.wantdo.stat.utils.DateUtil;
+import com.wantdo.stat.utils.NumUtil;
 import com.wantdo.stat.utils.Path;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -35,10 +37,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @ Date : 16/4/5
@@ -54,6 +54,13 @@ public class StockService {
 
     private static final String DEFAULT_ENCODING = "utf-8";
 
+    private static Map<Long, String> orderStatus = Maps.newLinkedHashMap();
+
+    static {
+        orderStatus.put(0L, "未出库");
+        orderStatus.put(1L, "已出库");
+    }
+
     @Autowired
     private StockOrderDao stockOrderDao;
 
@@ -62,6 +69,14 @@ public class StockService {
 
     @Autowired
     private PlatformDao platformDao;
+
+    public StockOrder findLastRecord(){
+        return stockOrderDao.findFirstByOrderByIdDesc();
+    }
+
+    public List<StockOrder> findAllStockOrders(){
+        return (List<StockOrder>) stockOrderDao.findAll();
+    }
 
 
     public TableDTO<StockOrderVo> getsStockOrderVo(Long platformId, Map<String, Object> searchParams, int pageNumber, int pageSize,
@@ -76,7 +91,9 @@ public class StockService {
             stockOrderVo.setOrderId(so.getOrderId());
             stockOrderVo.setStockId(so.getStockId());
             stockOrderVo.setOutStock(so.getOutStock());
+            stockOrderVo.setPlatform(so.getPlatform().getName());
             stockOrderVo.setWarehouse(so.getWarehouse());
+            stockOrderVo.setStatus(orderStatus.get(so.getStatus()));
             stockOrderVo.setCreated(so.getCreated());
             stockOrderVo.setModified(so.getModified());
             stockOrderVoList.add(stockOrderVo);
@@ -132,7 +149,7 @@ public class StockService {
         try {
             String now = new DateTime().toString(DateFormatConstant.FORMAT_yyyyMMdd);
 
-            String relativeFold = "com/wantdo/stat/web/shop/stock/stock" + File.separator + "upload" + File.separator;
+            String relativeFold = "outstock" + File.separator + "upload" + File.separator;
             String fullRelativeFold = PathConstant.FILE_STORE_PATH + relativeFold;
             String relativePath = relativeFold + System.currentTimeMillis() + "." + suffix;
             String fullPath = PathConstant.FILE_STORE_PATH + relativePath;
@@ -194,6 +211,12 @@ public class StockService {
                 orderId = row0;
             }
 
+            String row1 = ExcelReadHelper.getCell(row.get(1));
+            Date outStock = null;
+            if (row1 != null) {
+                outStock = randomDate(row1);
+            }
+
             String row2 = ExcelReadHelper.getCell(row.get(2));
             String sku = "";
             if (row2 != null) {
@@ -241,9 +264,20 @@ public class StockService {
                 StockOrder stockOrder = new StockOrder();
                 StockOrderItem stockOrderItem = new StockOrderItem();
 
+                StockOrder lastRecord = findLastRecord();
+                String stockId = "";
+                if (lastRecord == null) {
+                    stockId = NumUtil.addOne(NumUtil.STR_FORMAT);
+                } else {
+                    stockId = NumUtil.addOne(lastRecord.getStockId());
+                }
+
+                stockOrder.setStockId(stockId);
                 stockOrder.setOrderId(orderId);
+                stockOrder.setOutStock(outStock);
                 stockOrder.setPlatform(platform);
                 stockOrder.setWarehouse(warehouse);
+                stockOrder.setStatus(0L);
                 stockOrderDao.save(stockOrder);
 
                 stockOrderItem.setStockOrder(stockOrder);
@@ -257,6 +291,7 @@ public class StockService {
             } else {
 
                 stockOrderExist.setOrderId(orderId);
+                stockOrderExist.setOutStock(outStock);
                 stockOrderExist.setPlatform(platform);
                 stockOrderExist.setWarehouse(warehouse);
                 stockOrderDao.save(stockOrderExist);
@@ -289,7 +324,7 @@ public class StockService {
     public PDFVo downloadPDF(){
         PDFVo pdfVo = new PDFVo();
         String now = new DateTime().toString(DateFormatConstant.FORMAT_yyyyMMdd);
-        String relativeFold = "stock" + File.separator + "download" +  File.separator;
+        String relativeFold = "outstock" + File.separator + "download" +  File.separator;
         String fullRelativeFold = PathConstant.FILE_STORE_PATH + relativeFold;
         String fileName = System.currentTimeMillis() + ".pdf";
         String relativePath = relativeFold + fileName;
@@ -309,24 +344,20 @@ public class StockService {
     private PDFVo generatePDF(String fullPath){
         PDFVo pdfVo = new PDFVo();
         try {
-            Map<String, Object> variables = new HashMap<String, Object>();
+            Map<String, Object> variables = new HashMap<>();
 
-            List<User> userList = new ArrayList<User>();
+            List<StockOrder> stockOrderList = stockOrderDao.findAllUnStocked();
 
-            User tom = new User();
-            tom.setName("tom");
-            User amy = new User();
-            amy.setName("amy");
-
-            userList.add(tom);
-            userList.add(amy);
-
-            variables.put("userList", userList);
+            variables.put("stockOrderList", stockOrderList);
 
             String htmlStr = HtmlHelper.generate("template.ftl", variables);
 
             OutputStream out = new FileOutputStream(fullPath);
             PDFHelper.generate(htmlStr, out);
+            for(StockOrder stockOrder : stockOrderList){
+                stockOrder.setStatus(1L);
+                stockOrderDao.save(stockOrder);
+            }
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -336,6 +367,16 @@ public class StockService {
 
     }
 
-
+    private Date randomDate(String dateStr) throws Exception{
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String date = simpleDateFormat.format(new Date(dateStr));
+            String start = date + " 08:30:00";
+            String end = date + " 18:00:00";
+            return DateUtil.randomDate(start, end);
+        } catch (Exception e) {
+            throw new ServiceException("日期转换错误");
+        }
+    }
 
 }

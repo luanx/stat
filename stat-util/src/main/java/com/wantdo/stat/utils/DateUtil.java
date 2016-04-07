@@ -387,4 +387,23 @@ public class DateUtil {
         }
     }
 
+    public static Date randomDate(String beginDate, String endDate) throws Exception{
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date start = simpleDateFormat.parse(beginDate);
+        Date end = simpleDateFormat.parse(endDate);
+        if (start.getTime() >= end.getTime()) {
+            return null;
+        }
+        long date = random(start.getTime(), end.getTime());
+        return new Date(date);
+    }
+
+    private static long random(long begin, long end){
+        long rd = begin + (long) (Math.random() * (end - begin));
+        if (rd == begin || rd == end){
+            return random(begin, end);
+        }
+        return rd;
+    }
+
 }

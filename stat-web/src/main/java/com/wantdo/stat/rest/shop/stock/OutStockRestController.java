@@ -25,7 +25,7 @@ import java.util.Map;
  * @ Author : luanx@wantdo.com
  */
 @RestController
-@RequestMapping(value = "/api/v1/com.wantdo.stat.web.shop.stock.stock/outstock")
+@RequestMapping(value = "/api/v1/stock/outstock")
 public class OutStockRestController {
 
     private static Logger logger = LoggerFactory.getLogger(OutStockRestController.class);

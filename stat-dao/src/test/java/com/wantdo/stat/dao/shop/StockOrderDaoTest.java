@@ -26,4 +26,10 @@ public class StockOrderDaoTest extends SpringContextTestCase{
         System.out.println(stockOrder);
     }
 
+    @Test
+    public void findLastRecord() throws Exception {
+        StockOrder stockOrder = stockOrderDao.findFirstByOrderByIdDesc();
+        System.out.println(stockOrder.getId());
+    }
+
 }

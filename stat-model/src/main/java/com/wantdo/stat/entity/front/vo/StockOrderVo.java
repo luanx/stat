@@ -18,6 +18,7 @@ public class StockOrderVo implements Serializable {
     private String stockId;
     private Date outStock;
     private String warehouse;
+    private String status;
     private Date created;
     private Date modified;
     private String platform;
@@ -64,6 +65,14 @@ public class StockOrderVo implements Serializable {
 
     public void setWarehouse(String warehouse) {
         this.warehouse = warehouse;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Date getCreated() {

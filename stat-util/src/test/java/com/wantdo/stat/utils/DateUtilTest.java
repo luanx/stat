@@ -3,6 +3,8 @@ package com.wantdo.stat.utils;
 import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,6 +24,12 @@ public class DateUtilTest {
         String[] array = dates.toArray(new String[dates.size()]);
         System.out.println(array);
 
+        String dateStr = "Thu Apr 07 00:00:00 CST 2016";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String date = simpleDateFormat.format(new Date(dateStr));
+        String aaa = date + " 08:30:00";
+        String bbb = date + " 18:00:00";
+        System.out.println(aaa +"\n" + bbb);
 
     }
 

@@ -21,6 +21,7 @@ public class StockOrder extends IdEntity {
     private String stockId;
     private Date outStock;
     private String warehouse;
+    private Long status;
     private Date created;
     private Date modified;
 
@@ -70,6 +71,14 @@ public class StockOrder extends IdEntity {
 
     public void setWarehouse(String warehouse) {
         this.warehouse = warehouse;
+    }
+
+    public Long getStatus() {
+        return status;
+    }
+
+    public void setStatus(Long status) {
+        this.status = status;
     }
 
     public Date getCreated() {

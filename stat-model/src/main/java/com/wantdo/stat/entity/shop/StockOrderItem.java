@@ -25,6 +25,7 @@ public class StockOrderItem extends IdEntity{
     private Date modified;
 
     private StockOrder stockOrder;
+    private StockProduct stockProduct;
 
     public String getSku() {
         return sku;
@@ -91,5 +92,15 @@ public class StockOrderItem extends IdEntity{
 
     public void setStockOrder(StockOrder stockOrder) {
         this.stockOrder = stockOrder;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = StockProduct.class)
+    @JoinColumn(name = "sku", referencedColumnName = "sku", insertable = false, updatable = false)
+    public StockProduct getStockProduct() {
+        return stockProduct;
+    }
+
+    public void setStockProduct(StockProduct stockProduct) {
+        this.stockProduct = stockProduct;
     }
 }
