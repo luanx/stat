@@ -16,7 +16,7 @@
 
 <html>
 <head>
-  <title>订单管理</title>
+  <title>入库管理</title>
 </head>
 <body>
 
@@ -47,17 +47,20 @@
       </div>
 
       <div class="btn-group mr10">
-        <a id="btn_edit" href="javascript:void(0);" class="btn btn-info" data-toggle="modal"
-           data-target=".bs-example-modal-lg"><i
-                class="fa  fa-edit"></i> 编辑</a>
-        <a id="btn_out" class="btn btn-info" href="${lx}/stock/outstock/download"><i
-                class="fa  fa-camera-retro"></i> 出库</a>
+        <a id="btn_out" class="btn btn-info" href="${lx}/stock/instock/download"><i
+                class="fa  fa-camera-retro"></i> 入库</a>
       </div>
 
       <select id="platformList" class="selectpicker mr5" data-width="100px"
               data-style="btn btn-default">
         <c:forEach items="${platforms}" var="platform">
           <option value="${platform.id}">${platform.name}</option>
+        </c:forEach>
+      </select>
+      <select id="orderTypes" class="selectpicker mr5" data-width="100px"
+              data-style="btn btn-default">
+        <c:forEach items="${orderTypes}" var="orderType">
+          <option value="${orderType.key}">${orderType.value}</option>
         </c:forEach>
       </select>
 
@@ -97,105 +100,36 @@
           <div class="panel-body">
             <input type="hidden" name="id" id="orderDetailId"/>
 
-            <div class="form-group">
 
-              <label class="col-sm-3 control-label">上传时间</label>
-
-              <div class="col-sm-9">
-                <input type="text" class="form-control" name="created" id="created" disabled/>
-              </div>
-            </div>
             <div class="form-group">
-              <label class="col-sm-3 control-label">订单编号</label>
+              <label class="col-sm-3 control-label">销售订单号</label>
 
               <div class="col-sm-9">
                 <input type="text" class="form-control" name="orderId" id="orderId" disabled required/>
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-3 control-label">SKU</label>
+              <label class="col-sm-3 control-label">出库单号</label>
 
               <div class="col-sm-9">
-                <input type="text" class="form-control" name="sku" id="sku" disabled required/>
+                <input type="text" class="form-control" name="stockId" id="stockId" disabled required/>
               </div>
             </div>
+
             <div class="form-group">
-              <label class="col-sm-3 control-label">数量</label>
+
+              <label class="col-sm-3 control-label">出库时间</label>
+
+              <div class="col-sm-9">
+                <input type="text" class="form-control" name="created" id="created" disabled/>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-sm-3 control-label">仓库</label>
 
               <div class="col-sm-9">
                 <input type="text" class="form-control" name="quantityPurchased" id="quantityPurchased"
-                       required/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-3 control-label">配送方式</label>
-
-              <div class="col-sm-9">
-                <input type="text" class="form-control" name="shipServiceLevel" id="shipServiceLevel"
-                       required/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-3 control-label">收件人姓名</label>
-
-              <div class="col-sm-9">
-                <input type="text" class="form-control" name="recipientName" id="recipientName"
-                       required/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-3 control-label">收件人电话</label>
-
-              <div class="col-sm-9">
-                <input type="text" class="form-control" name="shipPhoneNumber" id="shipPhoneNumber"
-                       required/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-3 control-label">国家</label>
-
-              <div class="col-sm-9">
-                <input type="text" class="form-control" name="shipCountry" id="shipCountry"
-                       required/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-3 control-label">省/州</label>
-
-              <div class="col-sm-9">
-                <input type="text" class="form-control" name="shipState" id="shipState"
-                       required/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-3 control-label">城市</label>
-
-              <div class="col-sm-9">
-                <input type="text" class="form-control" name="shipCity" id="shipCity"
-                       required/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-3 control-label">配送地址</label>
-
-              <div class="col-sm-9">
-                <input type="text" class="form-control" name="shipAddress" id="shipAddress"
-                       required/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-3 control-label">邮编</label>
-
-              <div class="col-sm-9">
-                <input type="text" class="form-control" name="shipPostalCode" id="shipPostalCode"
-                       required/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-3 control-label">备注</label>
-
-              <div class="col-sm-9">
-                <input type="text" class="form-control" name="remark" id="remark"
                        required/>
               </div>
             </div>
@@ -253,7 +187,7 @@
     var platformId = ${platforms[0].id};
 
     var inputTable = jQuery("#inputTable").bootstrapTable({
-      "url": "${lx}/api/v1/com.wantdo.stat.web.shop.stock.stock/outstock/" + platformId,
+      "url": "${lx}/api/v1/stock/outstock/" + platformId + "?stockType=0",
       "method": "get",
       "striped": true,
       "sortOrder": "desc",
@@ -270,7 +204,7 @@
       "clickToSelect": true,
       "toolbar": "#custom-toolbar",
       "columns": [{
-        "field": "status",
+        "field": "ostatus",
         "checkbox": true
       }, {
         "field": "id",
@@ -326,6 +260,7 @@
       });
     }
 
+
     jQuery("#btn_edit").click(function () {
       var ids = getIdSelections();
       if (ids == null || ids.length == 0) {
@@ -356,20 +291,21 @@
     });
 
 
-    jQuery("#organizationList").change(function () {
-      organizationId = jQuery(this).find("option:selected").val();
+
+    jQuery("#platformList").change(function () {
+      platformId = jQuery(this).find("option:selected").val();
       var orderType = jQuery("#orderTypes").val();
-      inputTable.bootstrapTable('refresh', {url: '${lx}/api/v1/market/order/' + organizationId + "?orderType=" + orderType});
+      inputTable.bootstrapTable('refresh', {url: '${lx}/api/v1/stock/instock/' + platformId + "?stockType=0&orderType=" + orderType});
     });
 
     jQuery("#orderTypes").change(function () {
       var orderType = jQuery(this).find("option:selected").val();
-      inputTable.bootstrapTable('refresh', {url: '${lx}/api/v1/market/order/' + organizationId + "?orderType=" + orderType});
+      inputTable.bootstrapTable('refresh', {url: '${lx}/api/v1/stock/instock/' + platformId + "?stockType=0&orderType=" + orderType});
     });
 
     jQuery("#uploadExcel").click(function () {
       jQuery(this).fileupload({
-        url: '${lx}/com.wantdo.stat.web.shop.stock.stock/outstock/upload',
+        url: '${lx}/stock/instock/upload',
         dataType: 'json',
         maxNumberOfFiles: 1,
         maxFileSize: 5000000,
@@ -398,7 +334,6 @@
       }).prop('disabled', !$.support.fileInput)
               .parent().addClass($.support.fileInput ? undefined : 'disabled');
     });
-
 
   });
 </script>

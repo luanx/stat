@@ -34,8 +34,18 @@ import java.util.Map;
  * @Author : luanx@wantdo.com
  */
 @Controller
-@RequestMapping(value = "/stock/outstock")
-public class OutStockController {
+@RequestMapping(value = "/stock/instock")
+public class InStockController {
+
+    public static Map<Long, String> orderStatus = Maps.newLinkedHashMap();
+
+    static {
+        orderStatus.put(-1L, "所有订单");
+        orderStatus.put(0L, "未入库");
+        orderStatus.put(1L, "已入库");
+        orderStatus.put(2L, "问题单");
+
+    }
 
     @Autowired
     private UserService userService;
@@ -46,22 +56,12 @@ public class OutStockController {
     @Autowired
     private StockService stockService;
 
-    public static Map<Long, String> orderStatus = Maps.newLinkedHashMap();
-
-    static {
-        orderStatus.put(-1L, "所有订单");
-        orderStatus.put(0L, "未出库");
-        orderStatus.put(1L, "已出库");
-        orderStatus.put(2L, "问题单");
-
-    }
-
     @RequestMapping(method = RequestMethod.GET)
     public String list(Model model) {
         List<Platform> platforms = platformService.getAllPlatform();
         model.addAttribute("platforms", platforms);
         model.addAttribute("orderTypes", orderStatus);
-        return "shop/stock/outstockList";
+        return "shop/stock/instockList";
     }
 
     /**
@@ -71,7 +71,7 @@ public class OutStockController {
     public
     @ResponseBody
     ResponseVo upload(MultipartFile uploadExcel) {
-        return stockService.upload(uploadExcel, 1L);
+        return stockService.upload(uploadExcel, 0L);
     }
 
     @RequestMapping(value = "download", method = RequestMethod.GET)
@@ -81,7 +81,7 @@ public class OutStockController {
         ServletOutputStream sos = null;
         BufferedInputStream bis = null;
 
-        PDFVo pdfVo = stockService.downloadPDF(1L);
+        PDFVo pdfVo = stockService.downloadPDF(0L);
 
         String path = pdfVo.getPath();
 

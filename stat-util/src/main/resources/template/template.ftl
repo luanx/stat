@@ -8,8 +8,8 @@
 
     <title>出库单</title>
 
-    <link href="${basePath}/style.default.css" rel="stylesheet"/>
-    <link href="${basePath}/bootstrap.min.css" rel="stylesheet"/>
+    <link href="file:///usr/local/ideaIU_workspace/stat/stat-util/src/main/resources/template/style.default.css" rel="stylesheet"/>
+    <link href="file:///usr/local/ideaIU_workspace/stat/stat-util/src/main/resources/template/bootstrap.min.css" rel="stylesheet"/>
     <style>
         @page {
             size: 8.5in 11in;
@@ -26,7 +26,7 @@
  <div class="contentpanel" style="page-break-after:always;">
      <div class="panel panel-default">
          <div class="panel-heading">
-             <h2 style="text-align: center;font-family: SimSun;">出库单</h2>
+             <h2 style="text-align: center;font-family: SimSun;">${title}</h2>
          </div>
          <div class="panel-body">
 
@@ -60,7 +60,7 @@
                      <tbody>
                          <#list stockOrder.stockOrderItemList as stockOrderItem>
                             <tr>
-                                <td>${stockOrderItem_index + 1}</td>
+                                <td>${stockOrderItem_index}</td>
                                 <td>${stockOrderItem.sku?default("")}</td>
                                 <td>${stockOrderItem.stockProduct.name?default("")}</td>
                                 <td>${stockOrderItem.num?default("")}</td>

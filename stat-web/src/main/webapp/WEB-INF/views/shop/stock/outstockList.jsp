@@ -16,7 +16,7 @@
 
 <html>
 <head>
-  <title>订单管理</title>
+  <title>出库管理</title>
 </head>
 <body>
 
@@ -221,10 +221,6 @@
       }, {
         "field": "outStock",
         "title": "出库时间",
-        "formatter": formatter
-      }, {
-        "field": "status",
-        "title": "状态",
         "formatter": formatter
       }, {
         "field": "warehouse",

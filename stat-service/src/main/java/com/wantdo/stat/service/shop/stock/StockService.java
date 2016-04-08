@@ -1,7 +1,6 @@
 package com.wantdo.stat.service.shop.stock;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.wantdo.stat.constant.DateFormatConstant;
 import com.wantdo.stat.constant.PathConstant;
 import com.wantdo.stat.dao.shop.PlatformDao;
@@ -56,20 +55,6 @@ public class StockService {
 
     private static final String DEFAULT_ENCODING = "utf-8";
 
-    public static Map<Long, String> orderStatus = Maps.newLinkedHashMap();
-    public static Map<Long, String> stockStatus = Maps.newLinkedHashMap();
-
-    static {
-        orderStatus.put(-1L, "所有订单");
-        orderStatus.put(0L, "未出库");
-        orderStatus.put(1L, "已出库");
-        orderStatus.put(2L, "问题单");
-
-        stockStatus.put(0L, "入库");
-        stockStatus.put(1L, "出库");
-    }
-
-
     @Autowired
     private StockOrderDao stockOrderDao;
 
@@ -105,8 +90,6 @@ public class StockService {
             stockOrderVo.setOutStock(so.getOutStock());
             stockOrderVo.setPlatform(so.getPlatform().getName());
             stockOrderVo.setWarehouse(so.getWarehouse());
-            stockOrderVo.setStatus(orderStatus.get(so.getStatus()));
-            stockOrderVo.setStocktype(stockStatus.get(so.getStockType()));
             stockOrderVo.setCreated(so.getCreated());
             stockOrderVo.setModified(so.getModified());
             stockOrderVoList.add(stockOrderVo);
@@ -359,7 +342,7 @@ public class StockService {
         }
     }
 
-    public PDFVo downloadPDF(){
+    public PDFVo downloadPDF(Long stockType){
         PDFVo pdfVo = new PDFVo();
         String now = new DateTime().toString(DateFormatConstant.FORMAT_yyyyMMdd);
         String relativeFold = "outstock" + File.separator + "download" +  File.separator;
@@ -373,19 +356,27 @@ public class StockService {
             fullFoldFile.mkdirs();
         }
 
-        this.generatePDF(fullPath);
+        this.generatePDF(fullPath, stockType);
         pdfVo.setName(fileName);
         pdfVo.setPath(fullPath);
         return pdfVo;
     }
 
-    private PDFVo generatePDF(String fullPath){
+    private PDFVo generatePDF(String fullPath, Long stockType){
         PDFVo pdfVo = new PDFVo();
         try {
             Map<String, Object> variables = new HashMap<>();
 
             List<StockOrder> stockOrderList = stockOrderDao.findAllUnStocked();
+
+            String title = "";
             variables.put("stockOrderList", stockOrderList);
+            if (stockType == 0L){
+                title = "入库单";
+            } else {
+                title = "出库单";
+            }
+            variables.put("title", title);
 
             String htmlStr = HtmlHelper.generate("template.ftl", variables);
 
