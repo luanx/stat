@@ -22,6 +22,7 @@ public class StockOrder extends IdEntity {
     private Date outStock;
     private String warehouse;
     private Long status;
+    private Long stockType;
     private Date created;
     private Date modified;
 
@@ -79,6 +80,15 @@ public class StockOrder extends IdEntity {
 
     public void setStatus(Long status) {
         this.status = status;
+    }
+
+    @Column(name = "stocktype")
+    public Long getStockType() {
+        return stockType;
+    }
+
+    public void setStockType(Long stockType) {
+        this.stockType = stockType;
     }
 
     public Date getCreated() {

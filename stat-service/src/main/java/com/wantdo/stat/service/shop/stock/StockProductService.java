@@ -4,12 +4,16 @@ import com.google.common.collect.Lists;
 import com.wantdo.stat.constant.DateFormatConstant;
 import com.wantdo.stat.constant.PathConstant;
 import com.wantdo.stat.dao.shop.PlatformDao;
+import com.wantdo.stat.dao.shop.StockOrderDao;
+import com.wantdo.stat.dao.shop.StockOrderItemDao;
 import com.wantdo.stat.dao.shop.StockProductDao;
 import com.wantdo.stat.entity.front.response.ResponseVo;
 import com.wantdo.stat.entity.front.response.ResponseVoResultCode;
 import com.wantdo.stat.entity.front.vo.StockProductVo;
 import com.wantdo.stat.entity.front.vo.TableDTO;
 import com.wantdo.stat.entity.shop.Platform;
+import com.wantdo.stat.entity.shop.StockOrder;
+import com.wantdo.stat.entity.shop.StockOrderItem;
 import com.wantdo.stat.entity.shop.StockProduct;
 import com.wantdo.stat.excel.helper.ExcelReadHelper;
 import com.wantdo.stat.persistence.DynamicSpecifications;
@@ -17,6 +21,7 @@ import com.wantdo.stat.persistence.SearchFilter;
 import com.wantdo.stat.service.account.ServiceException;
 import com.wantdo.stat.utils.Clock;
 import com.wantdo.stat.utils.Path;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +59,12 @@ public class StockProductService {
 
     @Autowired
     private StockProductDao stockProductDao;
+
+    @Autowired
+    private StockOrderDao stockOrderDao;
+
+    @Autowired
+    private StockOrderItemDao stockOrderItemDao;
 
     @Autowired
     private PlatformDao platformDao;
@@ -220,7 +231,7 @@ public class StockProductService {
             String row3 = ExcelReadHelper.getCell(row.get(3));
             String name = "";
             if (row3 != null) {
-                name = row3;
+                name = StringUtils.replacePattern(row3, "&^#", "&amp;" );
             }
 
             String row4 = ExcelReadHelper.getCell(row.get(4));
@@ -266,6 +277,24 @@ public class StockProductService {
                 stockProductDao.save(stockProductExist);
             }
 
+            List<StockOrderItem> stockOrderItemList = stockOrderItemDao.findAllExceptionBySku(sku);
+            for(StockOrderItem stockOrderItem: stockOrderItemList){
+                stockOrderItem.setStatus(0L);
+                StockOrder stockOrder = stockOrderItem.getStockOrder();
+                List<StockOrderItem> sol = stockOrder.getStockOrderItemList();
+                stockOrderItemDao.save(stockOrderItem);
+                for (StockOrderItem soi : sol) {
+                    if (soi.getStatus() == 2L){
+                        stockOrder.setStatus(2L);
+                        break;
+                    }
+                }
+                stockOrder.setStatus(0L);
+                stockOrderDao.save(stockOrder);
+            }
+
+
         }
+        logger.info("product upload completed");
     }
 }

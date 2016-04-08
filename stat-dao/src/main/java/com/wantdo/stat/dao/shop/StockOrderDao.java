@@ -1,6 +1,7 @@
 package com.wantdo.stat.dao.shop;
 
 import com.wantdo.stat.entity.shop.StockOrder;
+import com.wantdo.stat.entity.shop.StockOrderItem;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -21,5 +22,6 @@ public interface StockOrderDao extends PagingAndSortingRepository<StockOrder, Lo
     List<StockOrder> findAllUnStocked();
 
     StockOrder findFirstByOrderByIdDesc();
+
 
 }

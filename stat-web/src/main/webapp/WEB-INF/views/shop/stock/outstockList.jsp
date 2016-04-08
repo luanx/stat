@@ -57,6 +57,12 @@
           <option value="${platform.id}">${platform.name}</option>
         </c:forEach>
       </select>
+      <select id="orderTypes" class="selectpicker mr5" data-width="100px"
+              data-style="btn btn-default">
+        <c:forEach items="${orderTypes}" var="orderType">
+          <option value="${orderType.key}">${orderType.value}</option>
+        </c:forEach>
+      </select>
 
     </div>
 
@@ -181,7 +187,7 @@
     var platformId = ${platforms[0].id};
 
     var inputTable = jQuery("#inputTable").bootstrapTable({
-      "url": "${lx}/api/v1/stock/outstock/" + platformId,
+      "url": "${lx}/api/v1/stock/outstock/" + platformId + "?stockType=1",
       "method": "get",
       "striped": true,
       "sortOrder": "desc",
@@ -198,7 +204,7 @@
       "clickToSelect": true,
       "toolbar": "#custom-toolbar",
       "columns": [{
-        "field": "status",
+        "field": "ostatus",
         "checkbox": true
       }, {
         "field": "id",
@@ -215,6 +221,10 @@
       }, {
         "field": "outStock",
         "title": "出库时间",
+        "formatter": formatter
+      }, {
+        "field": "status",
+        "title": "状态",
         "formatter": formatter
       }, {
         "field": "warehouse",
@@ -288,7 +298,13 @@
 
     jQuery("#platformList").change(function () {
       platformId = jQuery(this).find("option:selected").val();
-      inputTable.bootstrapTable('refresh', {url: '${lx}/api/v1/stock/product/' + platformId});
+      var orderType = jQuery("#orderTypes").val();
+      inputTable.bootstrapTable('refresh', {url: '${lx}/api/v1/stock/outstock/' + platformId + "?stockType=1&orderType=" + orderType});
+    });
+
+    jQuery("#orderTypes").change(function () {
+      var orderType = jQuery(this).find("option:selected").val();
+      inputTable.bootstrapTable('refresh', {url: '${lx}/api/v1/stock/outstock/' + platformId + "?stockType=1&orderType=" + orderType});
     });
 
     jQuery("#uploadExcel").click(function () {

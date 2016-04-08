@@ -7,6 +7,7 @@ import com.wantdo.stat.constant.PathConstant;
 import com.wantdo.stat.dao.shop.PlatformDao;
 import com.wantdo.stat.dao.shop.StockOrderDao;
 import com.wantdo.stat.dao.shop.StockOrderItemDao;
+import com.wantdo.stat.dao.shop.StockProductDao;
 import com.wantdo.stat.entity.front.response.ResponseVo;
 import com.wantdo.stat.entity.front.response.ResponseVoResultCode;
 import com.wantdo.stat.entity.front.vo.PDFVo;
@@ -15,6 +16,7 @@ import com.wantdo.stat.entity.front.vo.TableDTO;
 import com.wantdo.stat.entity.shop.Platform;
 import com.wantdo.stat.entity.shop.StockOrder;
 import com.wantdo.stat.entity.shop.StockOrderItem;
+import com.wantdo.stat.entity.shop.StockProduct;
 import com.wantdo.stat.excel.helper.ExcelReadHelper;
 import com.wantdo.stat.persistence.DynamicSpecifications;
 import com.wantdo.stat.persistence.SearchFilter;
@@ -54,18 +56,28 @@ public class StockService {
 
     private static final String DEFAULT_ENCODING = "utf-8";
 
-    private static Map<Long, String> orderStatus = Maps.newLinkedHashMap();
+    public static Map<Long, String> orderStatus = Maps.newLinkedHashMap();
+    public static Map<Long, String> stockStatus = Maps.newLinkedHashMap();
 
     static {
+        orderStatus.put(-1L, "所有订单");
         orderStatus.put(0L, "未出库");
         orderStatus.put(1L, "已出库");
+        orderStatus.put(2L, "问题单");
+
+        stockStatus.put(0L, "入库");
+        stockStatus.put(1L, "出库");
     }
+
 
     @Autowired
     private StockOrderDao stockOrderDao;
 
     @Autowired
     private StockOrderItemDao stockOrderItemDao;
+
+    @Autowired
+    private StockProductDao stockProductDao;
 
     @Autowired
     private PlatformDao platformDao;
@@ -80,8 +92,8 @@ public class StockService {
 
 
     public TableDTO<StockOrderVo> getsStockOrderVo(Long platformId, Map<String, Object> searchParams, int pageNumber, int pageSize,
-                                        String sortType, String orderType) {
-        Page<StockOrder> stockOrders = SearchOrderDetail(platformId, searchParams, pageNumber, pageSize, sortType, orderType);
+                                        String sortType,Long stockType, Long orderType) {
+        Page<StockOrder> stockOrders = SearchOrderDetail(platformId, searchParams, pageNumber, pageSize, sortType, stockType, orderType);
         TableDTO<StockOrderVo> tableDTO = new TableDTO<>();
         List<StockOrderVo> stockOrderVoList = Lists.newArrayList();
         tableDTO.setTotal(stockOrders.getTotalElements());
@@ -94,6 +106,7 @@ public class StockService {
             stockOrderVo.setPlatform(so.getPlatform().getName());
             stockOrderVo.setWarehouse(so.getWarehouse());
             stockOrderVo.setStatus(orderStatus.get(so.getStatus()));
+            stockOrderVo.setStocktype(stockStatus.get(so.getStockType()));
             stockOrderVo.setCreated(so.getCreated());
             stockOrderVo.setModified(so.getModified());
             stockOrderVoList.add(stockOrderVo);
@@ -103,9 +116,9 @@ public class StockService {
     }
 
     public Page<StockOrder> SearchOrderDetail(Long platformId, Map<String, Object> searchParams, int pageNumber, int pageSize,
-                                               String sortType, String orderType) {
+                                               String sortType, Long stockType, Long orderType) {
         PageRequest pageRequest = buildPageRequest(pageNumber, pageSize, sortType);
-        Specification<StockOrder> spec = buildSpecification(platformId, searchParams, orderType);
+        Specification<StockOrder> spec = buildSpecification(platformId, searchParams, stockType,  orderType);
 
         return stockOrderDao.findAll(spec, pageRequest);
     }
@@ -113,9 +126,13 @@ public class StockService {
     /**
      * 创建动态查询条件组合.
      */
-    private Specification<StockOrder> buildSpecification(Long platformId, Map<String, Object> searchParams, String orderType) {
+    private Specification<StockOrder> buildSpecification(Long platformId, Map<String, Object> searchParams, Long stockType, Long orderType) {
         Map<String, SearchFilter> filters = SearchFilter.parse(searchParams);
         filters.put("platform.id", new SearchFilter("platform.id", SearchFilter.Operator.EQ, platformId));
+        filters.put("stockType", new SearchFilter("stockType", SearchFilter.Operator.EQ, stockType));
+        if (orderType != -1L){
+            filters.put("status", new SearchFilter("status", SearchFilter.Operator.EQ, orderType));
+        }
         Specification<StockOrder> spec = DynamicSpecifications.bySearchFilter(filters.values(), StockOrder.class);
         return spec;
     }
@@ -134,7 +151,7 @@ public class StockService {
         return new PageRequest(pageNumber - 1, pageSize, sort);
     }
 
-    public ResponseVo upload(MultipartFile uploadExcel) {
+    public ResponseVo upload(MultipartFile uploadExcel, Long stockType) {
         ResponseVo responseVo = ResponseVo.newInstance();
         String fileName = uploadExcel.getOriginalFilename();
         String suffix = Path.getSuffixFromPath(fileName);
@@ -172,7 +189,7 @@ public class StockService {
             bos.close();
 
             //解析Excel并写入数据库
-            stockOrderExcelRead(fullPath);
+            stockOrderExcelRead(fullPath, stockType);
 
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -194,7 +211,7 @@ public class StockService {
 
     }
 
-    private void stockOrderExcelRead(String file) throws Exception {
+    private void stockOrderExcelRead(String file, Long stockType) throws Exception {
 
         ArrayList<ArrayList<Object>> rowList = null;
         try {
@@ -222,6 +239,7 @@ public class StockService {
             if (row2 != null) {
                 sku = row2;
             }
+            StockProduct stockProduct = stockProductDao.findBySku(sku);
 
             String row3 = ExcelReadHelper.getCell(row.get(3));
             String series = "";
@@ -277,7 +295,12 @@ public class StockService {
                 stockOrder.setOutStock(outStock);
                 stockOrder.setPlatform(platform);
                 stockOrder.setWarehouse(warehouse);
-                stockOrder.setStatus(0L);
+                stockOrder.setStockType(stockType);
+                if (stockProduct != null){
+                    stockOrder.setStatus(0L);
+                } else {
+                    stockOrder.setStatus(2L);
+                }
                 stockOrderDao.save(stockOrder);
 
                 stockOrderItem.setStockOrder(stockOrder);
@@ -286,6 +309,11 @@ public class StockService {
                 stockOrderItem.setCategory(category);
                 stockOrderItem.setNum(num);
                 stockOrderItem.setAmount(amount);
+                if (stockProduct != null) {
+                    stockOrderItem.setStatus(0L);
+                } else {
+                    stockOrderItem.setStatus(2L);
+                }
                 stockOrderItemDao.save(stockOrderItem);
 
             } else {
@@ -294,6 +322,7 @@ public class StockService {
                 stockOrderExist.setOutStock(outStock);
                 stockOrderExist.setPlatform(platform);
                 stockOrderExist.setWarehouse(warehouse);
+                stockOrderExist.setStockType(stockType);
                 stockOrderDao.save(stockOrderExist);
 
                 StockOrderItem stockOrderItemExist = stockOrderItemDao.findByStockOrderIdAndSku(stockOrderExist.getId(), sku);
@@ -305,6 +334,11 @@ public class StockService {
                     stockOrderItem.setCategory(category);
                     stockOrderItem.setNum(num);
                     stockOrderItem.setAmount(amount);
+                    if (stockProduct == null) {
+                        stockOrderItem.setStatus(2L);
+                        stockOrderExist.setStatus(2L);
+                    }
+
                     stockOrderItemDao.save(stockOrderItem);
                 } else {
                     stockOrderItemExist.setStockOrder(stockOrderExist);
@@ -313,6 +347,10 @@ public class StockService {
                     stockOrderItemExist.setCategory(category);
                     stockOrderItemExist.setNum(num);
                     stockOrderItemExist.setAmount(amount);
+                    if (stockProduct == null) {
+                        stockOrderItemExist.setStatus(2L);
+                        stockOrderExist.setStatus(2L);
+                    }
                     stockOrderItemDao.save(stockOrderItemExist);
                 }
 
@@ -347,7 +385,6 @@ public class StockService {
             Map<String, Object> variables = new HashMap<>();
 
             List<StockOrder> stockOrderList = stockOrderDao.findAllUnStocked();
-
             variables.put("stockOrderList", stockOrderList);
 
             String htmlStr = HtmlHelper.generate("template.ftl", variables);
@@ -356,6 +393,10 @@ public class StockService {
             PDFHelper.generate(htmlStr, out);
             for(StockOrder stockOrder : stockOrderList){
                 stockOrder.setStatus(1L);
+                List<StockOrderItem> stockOrderItemList = stockOrder.getStockOrderItemList();
+                for(StockOrderItem stockOrderItem: stockOrderItemList){
+                    stockOrderItem.setStatus(1L);
+                }
                 stockOrderDao.save(stockOrder);
             }
 

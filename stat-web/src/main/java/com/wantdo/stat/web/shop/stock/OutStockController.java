@@ -48,6 +48,7 @@ public class OutStockController {
     public String list(Model model) {
         List<Platform> platforms = platformService.getAllPlatform();
         model.addAttribute("platforms", platforms);
+        model.addAttribute("orderTypes", stockService.orderStatus);
         return "shop/stock/outstockList";
     }
 
@@ -58,7 +59,7 @@ public class OutStockController {
     public
     @ResponseBody
     ResponseVo upload(MultipartFile uploadExcel) {
-        return stockService.upload(uploadExcel);
+        return stockService.upload(uploadExcel, 1L);
     }
 
     @RequestMapping(value = "download", method = RequestMethod.GET)

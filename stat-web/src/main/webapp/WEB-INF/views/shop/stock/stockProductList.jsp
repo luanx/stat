@@ -301,7 +301,7 @@
         url: '${lx}/stock/product/upload',
         dataType: 'json',
         maxNumberOfFiles: 1,
-        maxFileSize: 5000000,
+        maxFileSize: 10000000,
         submit: function (e, data) {
           $('#progress').show();
         },

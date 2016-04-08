@@ -46,7 +46,8 @@ public class OutStockRestController {
                                                  @RequestParam(value = "limit", defaultValue = PAGE_SIZE) int pageSize,
                                                  @RequestParam(value = "order", defaultValue = "auto") String sortType,
                                                  @RequestParam(value = "search", defaultValue = "") String search,
-                                                 @RequestParam(value = "orderType", defaultValue = "all") String orderType,
+                                                      @RequestParam(value = "stockType", defaultValue = "0") Long stockType,
+                                                 @RequestParam(value = "orderType", defaultValue = "-1") Long orderType,
                                                  @PathVariable("id") Long platformId,
                                                  ServletRequest request) {
         Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
@@ -54,7 +55,7 @@ public class OutStockRestController {
 
         int pageNumber = offset / pageSize + 1;
 
-        TableDTO<StockOrderVo> stocks = stockService.getsStockOrderVo(platformId, searchParams, pageNumber, pageSize, sortType, orderType);
+        TableDTO<StockOrderVo> stocks = stockService.getsStockOrderVo(platformId, searchParams, pageNumber, pageSize, sortType, stockType, orderType);
         if (stocks == null) {
             String message = "订单不存在";
             logger.warn(message);

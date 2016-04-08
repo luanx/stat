@@ -70,7 +70,7 @@
     <!-- Only needed because we require fileupload in the org.springframework.samples.mvc.fileupload package -->
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <!-- 指定所上传文件的总大小不能超过5000KB。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 -->
-        <property name="maxUploadSize" value="5000000"/>
+        <property name="maxUploadSize" value="10000000"/>
     </bean>
 
     <!-- 将Controller抛出的异常转到特定View, 保持SiteMesh的装饰效果 -->

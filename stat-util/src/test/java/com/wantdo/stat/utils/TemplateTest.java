@@ -62,6 +62,9 @@ public class TemplateTest {
 
             variables.put("stockOrderList", stockOrderList);
 
+            String basePath = PDFHelper.class.getClassLoader().getResource("").getPath();
+            System.out.println(basePath);
+
             String htmlStr = HtmlHelper.generate("template.ftl", variables);
 
             OutputStream out = new FileOutputStream(outputFile);

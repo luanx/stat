@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.List;
+
 /**
  * @Date : 2015-9-17
  * @From : stat
@@ -15,4 +17,6 @@ public interface StockOrderItemDao extends PagingAndSortingRepository<StockOrder
     @Query("select stockOrderItem from StockOrderItem stockOrderItem where stockorderid = ?1 and sku = ?2")
     StockOrderItem findByStockOrderIdAndSku(Long stockOrderId, String sku);
 
+    @Query("select stockOrderItem from StockOrderItem stockOrderItem where stockOrderItem.status = 2 and stockOrderItem.sku = ?1")
+    List<StockOrderItem> findAllExceptionBySku(String sku);
 }
